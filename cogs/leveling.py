@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 import sqlite3
 import math
@@ -61,10 +62,10 @@ class LevelSys(commands.Cog):
         conn.commit()
         conn.close()
     
-    @commands.command()
-    async def level(self, ctx: commands.Context, member: discord.Member = None):
+    @app_commands.command(name="level", description="Sends the level card for a given user.")
+    async def level(self, ctx: discord.Interaction, member: discord.Member = None):
         if member is None:
-            member = ctx.author
+            member = ctx.user
         
         member_id = member.id
         guild_id = ctx.guild.id
@@ -82,7 +83,7 @@ class LevelSys(commands.Cog):
             channel = self.bot.get_channel(int(1331840731026948159))
             
             if not channel:
-                await ctx.send(embed=embed)
+                await ctx.response.send_message(embed=embed)
             await channel.send(embed=embed)
         else:
             level = result[2]
@@ -104,12 +105,7 @@ class LevelSys(commands.Cog):
             )
             
             img_send = await img.card3()
-            
-            await self.bot.wait_until_ready()
-            channel = self.bot.get_channel(int(1331840731026948159))
-            if not channel:
-                await ctx.send(file=discord.File(img_send, filename="rank.png"))
-            await channel.send(file=discord.File(img_send, filename="rank.png"))
+            await ctx.response.send_message(file=discord.File(img_send, filename="rank.png"))
         
 async def setup(bot):
     await bot.add_cog(LevelSys(bot))
