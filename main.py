@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import asyncio
 import logging
+import keep_alive
 
 load_dotenv()
 
@@ -35,7 +36,10 @@ async def load():
 
 async def main():
     async with bot:
-        await load()
-        await bot.start(bot_token)
+        await asyncio.gather(
+            keep_alive.run_server(),  # Chạy server song song
+            load(),
+            bot.start(bot_token)
+        )
 
 asyncio.run(main())
